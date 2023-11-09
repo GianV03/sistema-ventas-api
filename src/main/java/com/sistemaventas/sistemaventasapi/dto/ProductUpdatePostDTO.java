@@ -1,8 +1,5 @@
 package com.sistemaventas.sistemaventasapi.dto;
 
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sistemaventas.sistemaventasapi.entities.UserEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,14 +8,13 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class ProductGetDTO {
+public class ProductUpdatePostDTO {
+
     private UUID id;
 
     private String name;
 
     private UUID typeId;
-
-    private String typeName;
 
     private Double salePrice;
 
@@ -28,11 +24,8 @@ public class ProductGetDTO {
 
     private String details;
 
-    private UUID userCreationId;
-
-    private UUID userUpdateId;
+    //private UUID userCreationId;
 
     private Date creationDate;
 
-    private Date updateDate;
 }

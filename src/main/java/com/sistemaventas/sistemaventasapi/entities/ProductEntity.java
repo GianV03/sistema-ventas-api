@@ -1,12 +1,13 @@
 package com.sistemaventas.sistemaventasapi.entities;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
+
 @Entity
 @Getter
 @Setter
@@ -14,6 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Table(name="product")
 public class ProductEntity {
+
     @Id
     @Column(name="id_product")
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,7 +24,8 @@ public class ProductEntity {
     @Column(name="product_name")
     private String name;
 
-    @Column(name="product_type")
+    @ManyToOne
+    @JoinColumn(name="product_type", referencedColumnName = "id_product_type")
     private ProductTypeEntity type;
 
     @Column(name="product_sale_price")
@@ -31,18 +34,20 @@ public class ProductEntity {
     @Column(name="product_purchase_price")
     private Double purchasePrice;
 
-    @Column(name="product_supplier")
-    private SupplierEntity productSupplier;
-
+    @ManyToOne
+    @JoinColumn(name="product_supplier", referencedColumnName = "id_supplier")
+    private SupplierEntity supplier;
 
     @Column(name="product_details")
     private String details;
 
- /*   @Column(name="product_user_creation")
-    private User userCreation;
+    @ManyToOne
+    @JoinColumn(name="product_user_creation", referencedColumnName = "id_user")
+    private UserEntity userCreation;
 
-    @Column(name="product_user_update")
-    private User userUpdate;*/
+    @ManyToOne
+    @JoinColumn(name="product_user_update", referencedColumnName = "id_user")
+    private UserEntity userUpdate;
 
     @Column(name="product_date_creation")
     private Date creationDate;
