@@ -37,6 +37,20 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/byName")
+    public ResponseEntity<Page<ProductGetDTO>> findProductsByName(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ){
+        try{
+            return ResponseEntity.ok(productService.findProductsByName(name, page, size));
+        }catch(Exception exception){
+            System.out.println(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProductGetDTO> findProductById(
             @PathVariable String id

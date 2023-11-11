@@ -14,12 +14,14 @@ import com.sistemaventas.sistemaventasapi.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +51,15 @@ public class ProductService {
         List<ProductGetDTO> response = products.stream().
                                        map(x -> modelMapper.map(x, ProductGetDTO.class)).collect(Collectors.toList());
         return new PageImpl<>(response, products.getPageable(), products.getTotalPages());
+    }
+
+    public Page<ProductGetDTO> findProductsByName( String name, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        List<ProductEntity> productsList = productRepository.findByNameStartingWithIgnoreCase(name);
+        List<ProductGetDTO> productsPage = productsList
+                .stream()
+                .map(product -> modelMapper.map(product, ProductGetDTO.class)).collect(Collectors.toList());
+        return new PageImpl<>(productsPage, pageable, productsList.size());
     }
 
     public ProductGetDTO findById(UUID id){
