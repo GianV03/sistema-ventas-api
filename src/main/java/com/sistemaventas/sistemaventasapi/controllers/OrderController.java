@@ -1,6 +1,7 @@
 package com.sistemaventas.sistemaventasapi.controllers;
 
 import com.sistemaventas.sistemaventasapi.dto.OrderGetDTO;
+import com.sistemaventas.sistemaventasapi.dto.OrderPostDTO;
 import com.sistemaventas.sistemaventasapi.dto.OrderTrayDTO;
 import com.sistemaventas.sistemaventasapi.services.OrderService;
 import org.aspectj.weaver.ast.Or;
@@ -8,10 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("orders")
@@ -33,5 +33,26 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<OrderGetDTO> findOrderById(
+            @PathVariable String id
+    ){
+        try{
+            OrderGetDTO order = orderService.findOrderById(UUID.fromString(id));
+            return ResponseEntity.ok(order);
+        }catch(Exception exception){
+            System.out.println(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createOrder(
+            @RequestBody OrderPostDTO order
+            ){
+        return ResponseEntity.ok("");
+    }
+
 
 }
