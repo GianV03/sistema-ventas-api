@@ -14,12 +14,10 @@ import java.util.UUID;
 @Getter
 @Setter
 public class OrderDetailGetDTO {
+
     private UUID orderId;
-
     private UUID productId;
-
     private int quantity;
     private double price;
-
     private double total;
 }

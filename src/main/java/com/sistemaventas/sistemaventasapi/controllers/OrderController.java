@@ -10,7 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.UUID;
 
 @RestController
@@ -48,10 +50,21 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createOrder(
-            @RequestBody OrderPostDTO order
+    public ResponseEntity<URI> createOrder(
+            @RequestBody OrderPostDTO order,
+            UriComponentsBuilder ucb
             ){
-        return ResponseEntity.ok("");
+        try{
+            OrderGetDTO createdOrder = orderService.createOrder(order);
+            URI locationOfNewOrder = ucb
+                    .path("/oders/{id}")
+                    .buildAndExpand(createdOrder.getId())
+                    .toUri();
+            return ResponseEntity.ok(locationOfNewOrder);
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
 
