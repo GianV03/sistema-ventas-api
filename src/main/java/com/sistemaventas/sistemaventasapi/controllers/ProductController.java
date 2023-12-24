@@ -37,6 +37,21 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/filters")
+    public ResponseEntity<Page<ProductGetDTO>> findProductByFilters(
+            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) String productType,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ){
+        try {
+            return ResponseEntity.ok(productService.findProductsByFilters(productName,productType, page, size));
+        }catch(Exception exception){
+            System.out.println(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
     @GetMapping("/byName")
     public ResponseEntity<Page<ProductGetDTO>> findProductsByName(
             @RequestParam String name,
