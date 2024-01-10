@@ -81,11 +81,11 @@ public class ProductService {
         criteriaQuery.where(filters);
         criteriaQuery.orderBy(criteriaBuilder.desc(root.get("name")));
 
-        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
-        countQuery.select(criteriaBuilder.count(countQuery.from(ProductEntity.class)));
+        //CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+        //countQuery.select(criteriaBuilder.count(countQuery.from(ProductEntity.class)));
         //countQuery.where(filters);
 
-        Long total = em.createQuery(countQuery).getSingleResult();
+        int total = criteriaQuery.getOrderList().size();
 
         Pageable pageable = PageRequest.of(
                 page,
@@ -152,6 +152,18 @@ public class ProductService {
 
         ProductEntity response = productRepository.save(productToUpdate);
         return modelMapper.map(response, ProductGetDTO.class);
+    }
+
+    public boolean deleteProduct(UUID id){
+
+        boolean deleted = false;
+        ProductEntity productToDelete = productRepository.findById(id).get();
+
+        if(productRepository.existsById(id)){
+            productRepository.deleteById(id);
+            deleted = true;
+        }
+        return deleted;
     }
 
 }

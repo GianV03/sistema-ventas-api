@@ -21,7 +21,7 @@ public class InventoryController {
     @GetMapping
     public ResponseEntity<Page<InventoryGetDTO>> findAllInventory(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size
+            @RequestParam(defaultValue = "2") int size
     ){
         try{
 
@@ -32,6 +32,21 @@ public class InventoryController {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
+        }
+    }
+
+    @GetMapping("/filters")
+    private ResponseEntity<Page<InventoryGetDTO>> findInventoryByFilters(
+            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) String productType,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ){
+        try{
+            Page<InventoryGetDTO> response = inventoryService.findInventoryByFilters(productName, productType, page, size);
+            return ResponseEntity.ok(response);
+        }catch(Exception exception){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 

@@ -47,7 +47,6 @@ public class ProductController {
         try {
             return ResponseEntity.ok(productService.findProductsByFilters(productName,productType, page, size));
         }catch(Exception exception){
-            System.out.println(exception.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -109,6 +108,22 @@ public class ProductController {
                     .toUri();
             return ResponseEntity.ok(locationOfProduct);
         }catch(Exception exception){
+            System.out.println(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteProduct(
+            @PathVariable String id
+    ){
+        try{
+            boolean deleted = productService.deleteProduct(UUID.fromString(id));
+            if(deleted){
+                return ResponseEntity.ok().body("Se eliminó el registro");
+            }else{
+                return ResponseEntity.ok().body("No existe el registro");
+            }
+        }catch (Exception exception){
             System.out.println(exception.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
