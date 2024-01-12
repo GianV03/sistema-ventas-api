@@ -58,8 +58,37 @@ public class ProductService {
     public Page<ProductGetDTO> findProductsByFilters(String name, String productType, Integer page, Integer size){
 
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+        Root<ProductEntity> root = countQuery.from(ProductEntity.class);
+
+        Predicate[] predicates = buildPredicate(criteriaBuilder, root, name, productType);
+
+        countQuery.where(predicates);
+        countQuery.select(criteriaBuilder.count(root));
+        Long total = em.createQuery(countQuery).getSingleResult();
+
         CriteriaQuery<ProductEntity> criteriaQuery = criteriaBuilder.createQuery(ProductEntity.class);
-        Root<ProductEntity> root = criteriaQuery.from(ProductEntity.class);
+        criteriaQuery.from(ProductEntity.class);
+        criteriaQuery.where(predicates);
+        criteriaQuery.orderBy(criteriaBuilder.desc(root.get("name")));
+
+        Pageable pageable = PageRequest.of(
+                page,
+                     size
+        );
+
+        List<ProductEntity> filteredProducts = em.createQuery(criteriaQuery)
+                .setFirstResult((int) pageable.getOffset())
+                .setMaxResults(pageable.getPageSize())
+                .getResultList();
+
+        List<ProductGetDTO> response = filteredProducts.stream()
+                .map(p -> modelMapper.map(p, ProductGetDTO.class)).collect(Collectors.toList());
+
+        return new PageImpl<>(response, pageable, total);
+    }
+
+    Predicate[] buildPredicate(CriteriaBuilder criteriaBuilder, Root<ProductEntity> root, String name, String productType){
         List<Predicate> predicates = new ArrayList<>();
 
         if(name!=null){
@@ -76,31 +105,7 @@ public class ProductService {
             }
         }
 
-        Predicate[] predicatesArray = predicates.toArray(new Predicate[0]);
-        var filters = criteriaBuilder.and(predicatesArray);
-        criteriaQuery.where(filters);
-        criteriaQuery.orderBy(criteriaBuilder.desc(root.get("name")));
-
-        //CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
-        //countQuery.select(criteriaBuilder.count(countQuery.from(ProductEntity.class)));
-        //countQuery.where(filters);
-
-        int total = criteriaQuery.getOrderList().size();
-
-        Pageable pageable = PageRequest.of(
-                page,
-                     size
-        );
-
-        List<ProductEntity> filteredProducts = em.createQuery(criteriaQuery)
-                .setFirstResult((int) pageable.getOffset())
-                .setMaxResults(pageable.getPageSize())
-                .getResultList();
-
-        List<ProductGetDTO> response = filteredProducts.stream()
-                .map(p -> modelMapper.map(p, ProductGetDTO.class)).collect(Collectors.toList());
-
-        return new PageImpl<>(response, pageable, total);
+        return predicates.toArray(new Predicate[0]);
     }
 
     public Page<ProductGetDTO> findProductsByName( String name, int page, int size){

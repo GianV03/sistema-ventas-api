@@ -34,12 +34,25 @@ public class SupplierController {
     @GetMapping("/page")
     public ResponseEntity<Page<SupplierGetDTO>> findAllSuppliers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size
+            @RequestParam(defaultValue = "10") int size
     ){
         try{
             Page<SupplierGetDTO> supplierGetDTOList = supplierService.findSupliers(page, size);
             return ResponseEntity.ok(supplierGetDTOList);
         }catch (Exception exception){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @GetMapping("/filters")
+    public ResponseEntity<Page<SupplierGetDTO>> findSuppliersByFilters(
+            @RequestParam(required = false) String supplierName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        try{
+            return ResponseEntity.ok(supplierService.findSuppliersByFilters( supplierName, page, size));
+        }catch(Exception exception){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -90,5 +103,15 @@ public class SupplierController {
         }
     }
 
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteSupplier(
+            @PathVariable String id
+    ){
+        try{
+            supplierService.deleteSupplier(id);
+            return ResponseEntity.ok("Se ha eliminado el proveedor");
+        }catch(Exception exception){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
 }

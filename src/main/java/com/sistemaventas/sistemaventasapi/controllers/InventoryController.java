@@ -21,7 +21,7 @@ public class InventoryController {
     @GetMapping
     public ResponseEntity<Page<InventoryGetDTO>> findAllInventory(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "2") int size
+            @RequestParam(defaultValue = "5") int size
     ){
         try{
 

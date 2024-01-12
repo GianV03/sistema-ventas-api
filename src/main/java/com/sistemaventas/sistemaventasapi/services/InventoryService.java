@@ -63,28 +63,22 @@ public class InventoryService {
         return modelMapper.map(inventoryRepository, InventoryGetDTO.class);
     }
     public Page<InventoryGetDTO> findInventoryByFilters(String productName, String productType, int page, int size){
+
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+
+        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+        Root<InventoryEntity> root = countQuery.from(InventoryEntity.class);
+
+        Predicate[] predicatesArray = buildPredicates(criteriaBuilder, root, productName, productType);
+
+        countQuery.where(predicatesArray);
+        countQuery.select(criteriaBuilder.count(root));
+        Long total = em.createQuery(countQuery).getSingleResult();
+
         CriteriaQuery<InventoryEntity> criteriaQuery = criteriaBuilder.createQuery(InventoryEntity.class);
-        Root<InventoryEntity> root = criteriaQuery.from(InventoryEntity.class);
+        criteriaQuery.from(InventoryEntity.class);
+        criteriaQuery.where(predicatesArray);
 
-        List<Predicate> predicates = new ArrayList<>();
-        if(productName!=null){
-            Expression<String> upperCaseProductName = criteriaBuilder.upper(root.get("product").get("name"));
-            Predicate productFilter = criteriaBuilder.like(upperCaseProductName, "%" + productName.toUpperCase() + "%");
-            predicates.add(productFilter);
-        }
-
-        if(productType!= null){
-            ProductTypeEntity type = productTypeRepository.findById(UUID.fromString(productType)).orElse(null);
-            Predicate productTypeFilter = criteriaBuilder.equal(root.get("product").get("type"), type);
-            predicates.add(productTypeFilter);
-        }
-
-        Predicate[] predicatesArray = predicates.toArray(new Predicate[0]);
-        var filters = criteriaBuilder.and(predicatesArray);
-        criteriaQuery.where(filters);
-
-        int total = criteriaQuery.getOrderList().size();
 
         Pageable pageable = PageRequest.of(
                 page,
@@ -100,6 +94,23 @@ public class InventoryService {
                 .map(p -> modelMapper.map(p, InventoryGetDTO.class)).collect(Collectors.toList());
 
         return new PageImpl<>(response, pageable, total);
+    }
+
+    public Predicate[] buildPredicates(CriteriaBuilder criteriaBuilder, Root<InventoryEntity> root, String productName, String productType){
+        List<Predicate> predicates = new ArrayList<>();
+        if(productName!=null){
+            Expression<String> upperCaseProductName = criteriaBuilder.upper(root.get("product").get("name"));
+            Predicate productFilter = criteriaBuilder.like(upperCaseProductName, productName.toUpperCase() + "%");
+            predicates.add(productFilter);
+        }
+
+        if(productType!= null){
+            ProductTypeEntity type = productTypeRepository.findById(UUID.fromString(productType)).orElse(null);
+            Predicate productTypeFilter = criteriaBuilder.equal(root.get("product").get("type"), type);
+            predicates.add(productTypeFilter);
+        }
+
+        return predicates.toArray(new Predicate[0]);
     }
 
     public InventoryGetDTO saveIntentory(InventoryPostDTO inventory){

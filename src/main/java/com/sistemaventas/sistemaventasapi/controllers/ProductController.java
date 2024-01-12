@@ -42,7 +42,7 @@ public class ProductController {
             @RequestParam(required = false) String productName,
             @RequestParam(required = false) String productType,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size
+            @RequestParam(defaultValue = "10") int size
     ){
         try {
             return ResponseEntity.ok(productService.findProductsByFilters(productName,productType, page, size));
