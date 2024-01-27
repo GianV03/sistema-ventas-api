@@ -109,21 +109,33 @@ public class ProductService {
     }
 
     public Page<ProductGetDTO> findProductsByName( String name, int page, int size){
+
         Pageable pageable = PageRequest.of(page, size);
         List<ProductEntity> productsList = productRepository.findByNameStartingWithIgnoreCase(name);
         List<ProductGetDTO> productsPage = productsList
                 .stream()
                 .map(product -> modelMapper.map(product, ProductGetDTO.class)).collect(Collectors.toList());
         return new PageImpl<>(productsPage, pageable, productsList.size());
+
+    }
+
+    public List<ProductGetDTO> findProductsBySupplier(String supplierId){
+
+        List<ProductEntity> filteredProducts = productRepository.findBySupplierId(UUID.fromString(supplierId));
+        return filteredProducts.stream().map(p -> modelMapper.map(p, ProductGetDTO.class)).collect(Collectors.toList());
+
     }
 
     public ProductGetDTO findById(UUID id){
+
         ProductEntity product = productRepository.findById(id).get();
         ProductGetDTO response = modelMapper.map(product, ProductGetDTO.class);
         return response;
+
     }
 
     public ProductGetDTO createProduct(ProductPostDTO product){
+
         ProductEntity productToCreate = new ProductEntity();
         productToCreate.setName(product.getName());
         ProductTypeEntity type = productTypeRepository.findById(product.getTypeId()).get();
@@ -139,6 +151,7 @@ public class ProductService {
 
         ProductEntity response = productRepository.save(productToCreate);
         return modelMapper.map(response, ProductGetDTO.class);
+
     }
 
     public ProductGetDTO updateProduct(ProductUpdatePostDTO product){

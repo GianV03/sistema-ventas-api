@@ -12,4 +12,6 @@ import java.util.UUID;
  public interface ProductRepository extends JpaRepository<ProductEntity, UUID> {
   List<ProductEntity> findByNameStartingWithIgnoreCase(String name);
 
+  List <ProductEntity> findBySupplierId(UUID id);
+
 }

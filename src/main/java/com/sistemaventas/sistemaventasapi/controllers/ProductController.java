@@ -60,7 +60,18 @@ public class ProductController {
         try{
             return ResponseEntity.ok(productService.findProductsByName(name, page, size));
         }catch(Exception exception){
-            System.out.println(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @GetMapping("/bySupplier/{supplierId}")
+    public ResponseEntity<List<ProductGetDTO>> findProductsBySupplier(
+            @PathVariable String supplierId
+    ){
+        try{
+            return ResponseEntity.ok().body(productService.findProductsBySupplier(supplierId));
+        }catch(Exception e){
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
@@ -82,7 +93,6 @@ public class ProductController {
             UriComponentsBuilder ucb
             ){
         try{
-
             ProductGetDTO savedProduct = productService.createProduct(product);
             URI locationOfNewProduct = ucb
                     .path("products/{id}")
